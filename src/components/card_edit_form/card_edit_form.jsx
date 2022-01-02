@@ -3,7 +3,7 @@ import styles from './card_edit_form.module.css';
 import Button from '../button/button';
 
 const CardEditForm = ({ FileInput, card, createOrUpdateCard, deleteCard }) => {
-  const { name, company, email, title, theme, fileURL, message } = card;
+  const { name, company, email, title, theme, fileName, message } = card;
 
   const onSubmit = () => {
     deleteCard(card);
@@ -46,7 +46,12 @@ const CardEditForm = ({ FileInput, card, createOrUpdateCard, deleteCard }) => {
         value={company}
         onChange={onChange}
       />
-      <select className={styles.select} name="theme" value={theme}>
+      <select
+        className={styles.select}
+        name="theme"
+        value={theme}
+        onChange={onChange}
+      >
         <option value="light">light</option>
         <option value="dark">dark</option>
         <option value="colorful">colorful</option>
@@ -72,7 +77,7 @@ const CardEditForm = ({ FileInput, card, createOrUpdateCard, deleteCard }) => {
         onChange={onChange}
       ></textarea>
       <div className={styles.fileInput}>
-        <FileInput name={name} onFileChange={onFileChange} />
+        <FileInput name={fileName} onFileChange={onFileChange} />
       </div>
       <Button name="Delete" onClick={onSubmit} />
     </form>
