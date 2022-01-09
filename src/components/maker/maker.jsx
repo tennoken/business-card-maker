@@ -6,42 +6,10 @@ import { useHistory } from 'react-router';
 import Editor from '../editor/editor';
 import Preview from '../preview/preview';
 
-const Maker = ({ FileInput, authService }) => {
-  const [cards, setCards] = useState({
-    1: {
-      id: '1',
-      name: 'Kzero1',
-      company: 'Google',
-      email: 'kzero@naver.com',
-      title: 'Software Engineer',
-      theme: 'light',
-      message: 'Good!',
-      fileName: 'kzero',
-      fileURL: null,
-    },
-    2: {
-      id: '2',
-      name: 'Kzero2',
-      company: 'Google',
-      email: 'kzero@naver.com',
-      title: 'Software Engineer',
-      theme: 'dark',
-      message: 'Good!',
-      fileName: 'kzero',
-      fileURL: 'kzero.png',
-    },
-    3: {
-      id: '3',
-      name: 'Kzero3',
-      company: 'Google',
-      email: 'kzero@naver.com',
-      title: 'Software Engineer',
-      theme: 'colorful',
-      message: 'Good!',
-      fileName: 'kzero',
-      fileURL: null,
-    },
-  });
+const Maker = ({ FileInput, authService, cardRepository }) => {
+  const historyState = useHistory().state;
+  const [cards, setCards] = useState({});
+  const [userId, setUserId] = useState(historyState && historyState.id);
 
   const history = useHistory();
 
@@ -55,6 +23,7 @@ const Maker = ({ FileInput, authService }) => {
       updated[card.id] = card;
       return updated;
     });
+    cardRepository.saveCard(userId, card);
   };
 
   const deleteCard = (card) => {
@@ -63,11 +32,22 @@ const Maker = ({ FileInput, authService }) => {
       delete updated[card.id];
       return updated;
     });
+    cardRepository.removeCard(userId, card);
   };
 
   useEffect(() => {
+    if (!userId) return;
+    const stopSync = cardRepository.syncCard(userId, (cards) => {
+      setCards(cards);
+    });
+    return () => stopSync();
+  }, [cardRepository, userId]);
+
+  useEffect(() => {
     authService.onAuthStateChange((user) => {
-      if (!user) {
+      if (user) {
+        setUserId(user.uid);
+      } else {
         history.push('/');
       }
     });
